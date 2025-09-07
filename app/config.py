@@ -27,6 +27,6 @@ class TestingConfig(BaseConfig):
 class ProductionConfig(BaseConfig):
     DEBUG = False
     #SQLALCHEMY_DATABASE_URI = _normalize_db_uri(os.getenv("DATABASE_URL"))
-    SQLALCHEMY_DATABASE_URI =  os.environ.get("SQLALCHEMY_DATABASE_URL")
+    SQLALCHEMY_DATABASE_URI = os.environ.get("SQLALCHEMY_DATABASE_URI")
     if not SQLALCHEMY_DATABASE_URI:
-        raise RuntimeError("DATABASE_URL not set for ProductionConfig")
+        raise RuntimeError("SQLALCHEMY_DATABASE_URI not set for ProductionConfig")
