@@ -121,6 +121,69 @@ paths:
           description: "Mechanic already exists (email conflict)"
         500:
           description: "Internal server error"
+    get:
+      tags: [Mechanics]
+      summary: "Get all mechanics (public, paginated)"
+      description: "Public can view a paginated list of mechanics. Supports pagination with 'page' and 'per_page' query parameters."
+      parameters:
+        - name: page
+          in: query
+          type: integer
+          required: false
+          description: "Page number (for pagination). Example: 1"
+        - name: per_page
+          in: query
+          type: integer
+          required: false
+          description: "Results per page (for pagination). Example: 10"
+      responses:
+        200:
+          description: "Paginated list of mechanics (public view)"
+          schema:
+            type: object
+            properties:
+              total:
+                type: integer
+                example: 2
+              pages:
+                type: integer
+                example: 1
+              current_page:
+                type: integer
+                example: 1
+              mechanics:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    name:
+                      type: string
+                      example: "Al Bundy"
+                    username:
+                      type: string
+                      example: "Big Gay Al"
+                    phone:
+                      type: string
+                      example: "1487979019"
+          examples:
+            application/json:
+              total: 2
+              pages: 1
+              current_page: 1
+              mechanics:
+                - id: 1
+                  name: "Al Bundy"
+                  username: "Big Gay Al"
+                  phone: "1487979019"
+                - id: 2
+                  name: "Peg Bundy"
+                  username: "Peggy"
+                  phone: "1487979020"
+        400:
+          description: "Bad request"
   /mechanics/admin/update/{id}:
     put:
       tags: [Mechanics]
@@ -203,70 +266,6 @@ paths:
           description: "Mechanic not found"
         500:
           description: "Internal server error"
-  /mechanics/:
-    get:
-      tags: [Mechanics]
-      summary: "Get all mechanics (public, paginated)"
-      description: "Public can view a paginated list of mechanics. Supports pagination with 'page' and 'per_page' query parameters."
-      parameters:
-        - name: page
-          in: query
-          type: integer
-          required: false
-          description: "Page number (for pagination). Example: 1"
-        - name: per_page
-          in: query
-          type: integer
-          required: false
-          description: "Results per page (for pagination). Example: 10"
-      responses:
-        200:
-          description: "Paginated list of mechanics (public view)"
-          schema:
-            type: object
-            properties:
-              total:
-                type: integer
-                example: 2
-              pages:
-                type: integer
-                example: 1
-              current_page:
-                type: integer
-                example: 1
-              mechanics:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: integer
-                      example: 1
-                    name:
-                      type: string
-                      example: "Al Bundy"
-                    username:
-                      type: string
-                      example: "Big Gay Al"
-                    phone:
-                      type: string
-                      example: "1487979019"
-          examples:
-            application/json:
-              total: 2
-              pages: 1
-              current_page: 1
-              mechanics:
-                - id: 1
-                  name: "Al Bundy"
-                  username: "Big Gay Al"
-                  phone: "1487979019"
-                - id: 2
-                  name: "Peg Bundy"
-                  username: "Peggy"
-                  phone: "1487979020"
-        400:
-          description: "Bad request"
   /mechanics/secure-data:
     get:
       tags: [Mechanics]
