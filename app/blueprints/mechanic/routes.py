@@ -28,7 +28,8 @@ limiter = Limiter(
 )
 
 @mechanic_bp.route("/", methods = ['POST'])
-def create_mechanic():
+@admin_token_required
+def create_mechanic(current_user_id):
     data = request.get_json()
     
     if not data:
