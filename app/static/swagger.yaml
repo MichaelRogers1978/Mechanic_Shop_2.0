@@ -68,6 +68,29 @@ paths:
   /mechanics/admin/create:
     post:
       tags: [Mechanics]
+      summary: "Create admin user (username must be 'admin')"
+      description: "This endpoint is only for initial admin user creation. Username must be 'admin'. Not for mechanic creation."
+      parameters:
+        - in: body
+          name: admin
+          required: true
+          schema:
+            $ref: "#/definitions/AdminCreate"
+          example:
+            username: "admin"
+            password: "adminpassword"
+      responses:
+        201:
+          description: "Admin user created"
+        400:
+          description: "Invalid input or only 'admin' username allowed."
+        409:
+          description: "Admin already exists."
+        500:
+          description: "Internal server error"
+  /mechanics/:
+    post:
+      tags: [Mechanics]
       summary: "Admin add new mechanic"
       description: "Allows an admin to add a new mechanic. Requires Bearer token. Request body must include name, email, phone, and username. Password must be at least 6 characters. Returns the created mechanic object."
       security:
