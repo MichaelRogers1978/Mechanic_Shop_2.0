@@ -3,7 +3,7 @@ info:
   title: "Mechanic Shop API"
   description: "API for managing mechanics, customers, inventory, and service tickets."
   version: "1.0.0"
-host: "mechanic-shop-2-0-1.onrender.com" # render name: "your-app-name.onrender.com"
+host: "mechanic-shop-2-0-1.onrender.com"
 schemes:
   - "https"
 basePath: "/"
@@ -14,196 +14,511 @@ securityDefinitions:
     in: header
     description: "JWT token using Bearer token number. Example: 'Bearer {token number}'"
 paths:
-  /inventory/mechanic/:
-    get:
-      tags: [Inventory]
-      summary: "Mechanic gets paginated list of parts with pricing"
-      security:
-        - BearerAuth: []
-      parameters:
-        - name: page
-          in: query
-          type: integer
-        - name: per_page
-          in: query
-          type: integer
-      responses:
-        200:
-          description: "List of parts with pricing"
-        400:
-          description: "Bad request"
-        500:
-          description: "Internal server error"
-  /inventory/mechanic/{id}:
-    get:
-      tags: [Inventory]
-      summary: "Mechanic gets part by id with pricing"
-      security:
-        - BearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          type: integer
-      responses:
-        200:
-          description: "Part details with pricing"
-        404:
-          description: "Not found"
-        500:
-          description: "Internal server error"
-  /inventory/:
+  /mechanics/admin/login:
     post:
-      tags:
-        - Inventory
-      summary: Mechanic adds a new part
+      tags: [Logins]
+      summary: "Admin login"
+      parameters:
+        - in: body
+          name: adminLogin
+          required: true
+          schema:
+            $ref: "#/definitions/AdminLogin"
+      responses:
+        200:
+          description: "Admin login successful"
+        401:
+          description: "Invalid admin credentials"
+        500:
+          description: "Internal server error"
+  /mechanics/login:
+    post:
+      tags: [Logins]
+      summary: "Mechanic login"
+      parameters:
+        - in: body
+          name: credentials
+          required: true
+          schema:
+            $ref: "#/definitions/MechanicLogin"
+      responses:
+        200:
+          description: "Login successful (JWT token returned)"
+        401:
+          description: "Invalid credentials"
+        500:
+          description: "Internal server error"
+  /customers/login:
+    post:
+      tags: [Logins]
+      summary: "Customer login"
+      parameters:
+        - in: body
+          name: credentials
+          required: true
+          schema:
+            $ref: "#/definitions/CustomerLogin"
+      responses:
+        200:
+          description: "Login successful (JWT token returned)"
+        401:
+          description: "Invalid credentials"
+        500:
+          description: "Internal server error"
+  /mechanics/admin/create:
+    post:
+      tags: [Mechanics]
+      summary: "Admin add new mechanic"
       security:
         - BearerAuth: []
       parameters:
         - in: body
-          name: part
+          name: mechanic
           required: true
           schema:
-            $ref: '#/definitions/InventoryItem'
+            $ref: "#/definitions/MechanicCreate"
+          example:
+            name: "name"
+            username: "username"
+            email: "email@example.com"
+            address: "address"
+            phone: "1111111111"
+            hours_worked: "Integer"
+            password: "password"
+            specialty: "specialty"
       responses:
         201:
-          description: Part added
+          description: "Mechanic added by admin"
         400:
-          description: Bad request
+          description: "Invalid input"
+        409:
+          description: "Mechanic already exists"
+        500:
+          description: "Internal server error"
+  /mechanics/admin/update/{id}:
+    put:
+      tags: [Mechanics]
+      summary: "Admin update mechanic"
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: integer
+        - in: body
+          name: mechanic
+          required: true
+          schema:
+            $ref: "#/definitions/MechanicUpdate"
+      responses:
+        200:
+          description: "Mechanic updated by admin"
+        404:
+          description: "Mechanic not found"
+        500:
+          description: "Internal server error"
+  /mechanics/{id}:
     get:
-      tags:
-        - Inventory
-      summary: Public gets paginated list of parts
+      tags: [Mechanics]
+      summary: "Get mechanic by ID"
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: integer
+      responses:
+        200:
+          description: "Mechanic details"
+        404:
+          description: "Mechanic not found"
+        500:
+          description: "Internal server error"
+    put:
+      tags: [Mechanics]
+      summary: "Update mechanic profile"
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: integer
+        - in: body
+          name: mechanic
+          required: true
+          schema:
+            $ref: "#/definitions/MechanicUpdate"
+      responses:
+        200:
+          description: "Mechanic updated"
+        400:
+          description: "Invalid input"
+        403:
+          description: "Forbidden"
+        404:
+          description: "Mechanic not found"
+        500:
+          description: "Internal server error"
+    delete:
+      tags: [Mechanics]
+      summary: "Delete mechanic (admin only)"
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: integer
+      responses:
+        200:
+          description: "Mechanic deleted"
+        404:
+          description: "Mechanic not found"
+        500:
+          description: "Internal server error"
+  /mechanics/:
+    get:
+      tags: [Mechanics]
+      summary: "Get all mechanics (public, paginated)"
+      description: "Public can view a paginated list of mechanics. Supports pagination with 'page' and 'per_page' query parameters."
       parameters:
         - name: page
           in: query
-          schema:
-            type: integer
+          type: integer
           required: false
+          description: "Page number (for pagination). Example: 1"
         - name: per_page
           in: query
-          schema:
-            type: integer
+          type: integer
           required: false
-      responses:
-        '200':
-          description: List of parts
-        '400':
-          description: Bad request
-  /inventory/{id}:
-    get:
-      tags:
-        - Inventory
-      summary: Public gets part by id
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: Part details
-        '404':
-          description: Not found
-    put:
-      tags:
-        - Inventory
-      summary: Mechanic updates part
-      security:
-        - BearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: integer
-        - in: body
-          name: part
-          required: true
-          schema:
-            $ref: '#/definitions/InventoryItem'
+          description: "Results per page (for pagination). Example: 10"
       responses:
         200:
-          description: Part updated
+          description: "Paginated list of mechanics (public view)"
+          schema:
+            type: object
+            properties:
+              total:
+                type: integer
+                example: 2
+              pages:
+                type: integer
+                example: 1
+              current_page:
+                type: integer
+                example: 1
+              mechanics:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    name:
+                      type: string
+                      example: "Al Bundy"
+                    username:
+                      type: string
+                      example: "Big Gay Al"
+                    phone:
+                      type: string
+                      example: "1487979019"
+          examples:
+            application/json:
+              total: 2
+              pages: 1
+              current_page: 1
+              mechanics:
+                - id: 1
+                  name: "Al Bundy"
+                  username: "Big Gay Al"
+                  phone: "1487979019"
+                - id: 2
+                  name: "Peg Bundy"
+                  username: "Peggy"
+                  phone: "1487979020"
         400:
-          description: Bad request
-    delete:
-      tags:
-        - Inventory
-      summary: Mechanic deletes part
+          description: "Bad request"
+  /mechanics/secure-data:
+    get:
+      tags: [Mechanics]
+      summary: "Access secure data"
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: "Protected mechanic information"
+        401:
+          description: "Unauthorized"
+        500:
+          description: "Internal server error"
+  /mechanics/profile:
+    get:
+      tags: [Mechanics]
+      summary: "Get own mechanic profile"
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: "Mechanic profile"
+        401:
+          description: "Unauthorized"
+        500:
+          description: "Internal server error"
+  /mechanics/my-tickets:
+    get:
+      tags: [Mechanics]
+      summary: "Get my assigned tickets"
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: "List of tickets assigned to mechanic"
+        401:
+          description: "Unauthorized"
+        500:
+          description: "Internal server error"
+  /mechanics/dashboard:
+    get:
+      tags: [Mechanics]
+      summary: "Get mechanic dashboard information"
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: "Dashboard data with tickets & stats"
+        401:
+          description: "Unauthorized"
+        500:
+          description: "Internal server error"
+  /customers/:
+    post:
+      tags: [Customers]
+      summary: "Create customer (admin only)"
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: body
+          name: customer
+          required: true
+          schema:
+            $ref: "#/definitions/CustomerRegister"
+      responses:
+        201:
+          description: "Customer created"
+        400:
+          description: "Invalid input"
+        409:
+          description: "Email already exists"
+        500:
+          description: "Internal server error"
+  /customers/register:
+    post:
+      tags: [Customers]
+      summary: "Register new customer (public)"
+      parameters:
+        - in: body
+          name: customer
+          required: true
+          schema:
+            $ref: "#/definitions/CustomerRegister"
+      responses:
+        201:
+          description: "Customer registered"
+        400:
+          description: "Invalid input"
+        409:
+          description: "Email already exists"
+        500:
+          description: "Internal server error"
+  /customers/admin/{id}:
+    get:
+      tags: [Customers]
+      summary: "Admin gets customer by id"
       security:
         - BearerAuth: []
       parameters:
         - name: id
           in: path
           required: true
-          schema:
-            type: integer
+          type: integer
       responses:
-        '200':
-          description: Part deleted
-        '400':
-          description: Bad request
-  /inventory/search:
-    get:
-      tags:
-        - Inventory
-      summary: Public searches parts
-      parameters:
-        - name: q
-          in: query
-          required: true
-          schema:
-            type: string
-        - name: limit
-          in: query
-          required: false
-          schema:
-            type: integer
-      responses:
-        '200':
-          description: Search results
-        '400':
-          description: Bad request
-  /inventory/mechanic/search:
-    get:
-      tags:
-        - Inventory
-      summary: Mechanic searches part by name
+        200:
+          description: "Customer profile"
+        404:
+          description: "Customer not found"
+        500:
+          description: "Internal server error"
+  /customers/admin/update/{id}:
+    put:
+      tags: [Customers]
+      summary: "Admin updates customer"
       security:
         - BearerAuth: []
       parameters:
-        - name: q
-          in: query
+        - name: id
+          in: path
+          required: true
+          type: integer
+        - in: body
+          name: customer
           required: true
           schema:
-            type: string
+            $ref: "#/definitions/CustomerRegister"
       responses:
-        '200':
-          description: Search result
-        '400':
-          description: Bad request
-        '404':
-          description: Not found
-  /inventory/low-stock:
-    get:
-      tags:
-        - Inventory
-      summary: Mechanic gets low stock parts
+        200:
+          description: "Customer updated"
+        400:
+          description: "Invalid input"
+        404:
+          description: "Customer not found"
+        500:
+          description: "Internal server error"
+  /customers/admin/delete/{id}:
+    delete:
+      tags: [Customers]
+      summary: "Admin deletes customer"
       security:
         - BearerAuth: []
       parameters:
-        - name: threshold
-          in: query
-          required: false
-          schema:
-            type: integer
+        - name: id
+          in: path
+          required: true
+          type: integer
       responses:
-        '200':
-          description: List of low stock parts
-        '400':
-          description: Bad request
+        200:
+          description: "Customer deleted"
+        404:
+          description: "Customer not found"
+        500:
+          description: "Internal server error"
+  /customers/:
+    get:
+      tags: [Customers]
+      summary: "Get all customers (admin, paginated)"
+      description: "Admin views a paginated list of customers."
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          type: integer
+          required: false
+          description: "Page number (for pagination). Example: 1"
+        - name: per_page
+          in: query
+          type: integer
+          required: false
+          description: "Results per page (for pagination). Example: 10"
+      responses:
+        200:
+          description: "Paginated list of customers (admin view)"
+          schema:
+            type: object
+            properties:
+              total:
+                type: integer
+                example: 2
+              pages:
+                type: integer
+                example: 1
+              current_page:
+                type: integer
+                example: 1
+              customers:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    name:
+                      type: string
+                      example: "Kelly Bundy"
+                    email:
+                      type: string
+                      example: "kelly@example.com"
+                    phone:
+                      type: string
+                      example: "1234567890"
+          examples:
+            application/json:
+              total: 2
+              pages: 1
+              current_page: 1
+              customers:
+                - id: 1
+                  name: "Kelly Bundy"
+                  email: "kelly@example.com"
+                  phone: "1234567890"
+                - id: 2
+                  name: "Bud Bundy"
+                  email: "bud@example.com"
+                  phone: "0987654321"
+        400:
+          description: "Bad request"
+  /customers/{id}:
+    get:
+      tags: [Customers]
+      summary: "Customer view own profile"
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: integer
+      responses:
+        200:
+          description: "Customer profile"
+        403:
+          description: "Forbidden"
+        404:
+          description: "Customer not found"
+        500:
+          description: "Internal server error"
+    put:
+      tags: [Customers]
+      summary: "Update own customer profile"
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          type: integer
+        - in: body
+          name: customer
+          required: true
+          schema:
+            $ref: "#/definitions/CustomerRegister"
+      responses:
+        200:
+          description: "Customer updated"
+        400:
+          description: "Invalid input"
+        403:
+          description: "Forbidden"
+        404:
+          description: "Customer not found"
+        500:
+          description: "Internal server error"
+  /customers/my-tickets:
+    get:
+      tags: [Customers]
+      summary: "Get tickets for current customer"
+      security:
+        - BearerAuth: []
+      responses:
+        200:
+          description: "List of tickets"
+        401:
+          description: "Unauthorized"
+        500:
+          description: "Internal server error"
   /service-tickets/mechanic/create:
     post:
       tags:
@@ -226,12 +541,67 @@ paths:
     get:
       tags:
         - ServiceTicket
-      summary: Admin gets all service tickets
+      summary: Admin gets all service tickets (paginated)
+      description: "Admin views a paginated list of service tickets."
       security:
         - BearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          type: integer
+          required: false
+          description: "Page number (for pagination). Example: 1"
+        - name: per_page
+          in: query
+          type: integer
+          required: false
+          description: "Results per page (for pagination). Example: 10"
       responses:
         '200':
-          description: List of tickets
+          description: Paginated list of service tickets
+          schema:
+            type: object
+            properties:
+              total:
+                type: integer
+                example: 2
+              pages:
+                type: integer
+                example: 1
+              current_page:
+                type: integer
+                example: 1
+              tickets:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    description:
+                      type: string
+                      example: "Oil change"
+                    status:
+                      type: string
+                      example: "open"
+                    customer_id:
+                      type: integer
+                      example: 1
+          examples:
+            application/json:
+              total: 2
+              pages: 1
+              current_page: 1
+              tickets:
+                - id: 1
+                  description: "Oil change"
+                  status: "open"
+                  customer_id: 1
+                - id: 2
+                  description: "Tire rotation"
+                  status: "closed"
+                  customer_id: 2
         '500':
           description: Server error
   /service-tickets/{ticket_id}:
@@ -496,9 +866,99 @@ paths:
             description: Bad request
           500:
             description: Server error
+  /service-tickets/{ticket_id}/update:
+      put:
+        tags: [ServiceTicket]
+        summary: "Update ticket fields"
+        description: "Admin or assigned mechanic can update ticket fields (description, vehicle_id, hours_worked, repair). Requires BearerAuth."
+        security:
+          - BearerAuth: []
+        parameters:
+          - name: ticket_id
+            in: path
+            required: true
+            type: integer
+            description: "ID of the ticket to update."
+          - in: body
+            name: ticket
+            required: true
+            schema:
+              $ref: '#/definitions/ServiceTicketFieldsUpdate'
+      responses:
+        200:
+          description: "Ticket updated successfully"
+          schema:
+            type: object
+            properties:
+              message:
+                type: string
+                example: "Ticket 1 details updated successfully."
+              ticket:
+                type: object
+              updated_fields:
+                type: array
+                items:
+                  type: string
+          examples:
+            application/json:
+                message: "Ticket 1 details updated successfully."
+                ticket:
+                  id: 1
+                  hours_worked: 5
+                  description: "Tires have been replaced and vehicle is ready to go!"
+                updated_fields:
+                  - hours_worked
+                  - description
+        400:
+          description: "Bad request"
+        401:
+          description: "Unauthorized"
+        403:
+          description: "Forbidden"
+        500:
+          description: "Internal server error"
+  /inventory/:
+    post:
+      tags:
+        - Inventory
+      summary: Mechanic adds a new part
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: body
+          name: part
+          required: true
+          schema:
+            $ref: '#/definitions/InventoryItem'
+      responses:
+        201:
+          description: Part added
+        400:
+          description: Bad request
     get:
-      tags: [Mechanics]
-      summary: "Get mechanics (paginated)"
+      tags:
+        - Inventory
+      summary: Public gets paginated list of parts
+      parameters:
+        - name: page
+          in: query
+          schema:
+            type: integer
+          required: false
+        - name: per_page
+          in: query
+          schema:
+            type: integer
+          required: false
+      responses:
+        '200':
+          description: List of parts
+        '400':
+          description: Bad request
+  /inventory/mechanic/:
+    get:
+      tags: [Inventory]
+      summary: "Mechanic gets paginated list of parts with pricing"
       security:
         - BearerAuth: []
       parameters:
@@ -510,66 +970,17 @@ paths:
           type: integer
       responses:
         200:
-          description: "Paginated list of mechanics"
+          description: "List of parts with pricing"
         400:
-          description: "Invalid pagination number"
+          description: "Bad request"
         500:
           description: "Internal server error"
-    /mechanics/admin/add:
-    post:
-      tags: [Mechanics]
-      summary: "Admin add mechanic"
+  /inventory/mechanic/{id}:
+    get:
+      tags: [Inventory]
+      summary: "Mechanic gets part by id with pricing"
       security:
         - BearerAuth: []
-      parameters:
-        - in: body
-          name: mechanic
-          required: true
-          schema:
-            $ref: "#/definitions/MechanicCreate"
-      responses:
-        201:
-          description: "Mechanic added by admin"
-        400:
-          description: "Invalid input"
-        409:
-          description: "Mechanic already exists"
-        500:
-          description: "Internal server error"
-  /mechanics/login:
-    post:
-      tags: [Mechanics]
-      summary: "Mechanic login"
-      parameters:
-        - in: body
-          name: credentials
-          required: true
-          schema:
-            $ref: "#/definitions/MechanicLogin"
-      responses:
-        200:
-          description: "Login successful (JWT token returned)"
-        401:
-          description: "Invalid credentials"
-        500:
-          description: "Internal server error"
-  /mechanics/my-tickets:
-    get:
-      tags: [Mechanics]
-      summary: "Get my assigned tickets"
-      security:
-        - BearerAuth: []
-      responses:
-        200:
-          description: "List of tickets assigned to mechanic"
-        401:
-          description: "Unauthorized"
-        500:
-          description: "Internal server error"
-  /mechanics/{id}:
-    get:
-      tags: [Mechanics]
-      summary: "Get mechanic by ID"
       parameters:
         - name: id
           in: path
@@ -577,348 +988,125 @@ paths:
           type: integer
       responses:
         200:
-          description: "Mechanic details"
+          description: "Part details with pricing"
         404:
-          description: "Mechanic not found"
+          description: "Not found"
         500:
           description: "Internal server error"
+  /inventory/{id}:
+    get:
+      tags:
+        - Inventory
+      summary: Public gets part by id
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+      responses:
+        '200':
+          description: Part details
+        '404':
+          description: Not found
     put:
-      tags: [Mechanics]
-      summary: "Update mechanic profile"
+      tags:
+        - Inventory
+      summary: Mechanic updates part
       security:
         - BearerAuth: []
       parameters:
         - name: id
           in: path
           required: true
-          type: integer
+          schema:
+            type: integer
         - in: body
-          name: mechanic
+          name: part
           required: true
           schema:
-            $ref: "#/definitions/MechanicUpdate"
+            $ref: '#/definitions/InventoryItem'
       responses:
         200:
-          description: "Mechanic updated"
+          description: Part updated
         400:
-          description: "Invalid input"
-        403:
-          description: "Forbidden"
-        404:
-          description: "Mechanic not found"
-        500:
-          description: "Internal server error"
+          description: Bad request
     delete:
-      tags: [Mechanics]
-      summary: "Delete mechanic (admin only)"
+      tags:
+        - Inventory
+      summary: Mechanic deletes part
       security:
         - BearerAuth: []
       parameters:
         - name: id
           in: path
           required: true
-          type: integer
+          schema:
+            type: integer
       responses:
-        200:
-          description: "Mechanic deleted"
-        404:
-          description: "Mechanic not found"
-        500:
-          description: "Internal server error"
-  /mechanics/profile:
+        '200':
+          description: Part deleted
+        '400':
+          description: Bad request
+  /inventory/search:
     get:
-      tags: [Mechanics]
-      summary: "Get own mechanic profile"
-      security:
-        - BearerAuth: []
+      tags:
+        - Inventory
+      summary: Public searches parts
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
       responses:
-        200:
-          description: "Mechanic profile"
-        401:
-          description: "Unauthorized"
-        500:
-          description: "Internal server error"
-  /mechanics/dashboard:
+        '200':
+          description: Search results
+        '400':
+          description: Bad request
+  /inventory/mechanic/search:
     get:
-      tags: [Mechanics]
-      summary: "Get mechanic dashboard information"
+      tags:
+        - Inventory
+      summary: Mechanic searches part by name
       security:
         - BearerAuth: []
+      parameters:
+        - name: q
+          in: query
+          required: true
+          schema:
+            type: string
       responses:
-        200:
-          description: "Dashboard data with tickets & stats"
-        401:
-          description: "Unauthorized"
-        500:
-          description: "Internal server error"
-  /mechanics/secure-data:
+        '200':
+          description: Search result
+        '400':
+          description: Bad request
+        '404':
+          description: Not found
+  /inventory/low-stock:
     get:
-      tags: [Mechanics]
-      summary: "Access secure data"
-      security:
-        - BearerAuth: []
-      responses:
-        200:
-          description: "Protected mechanic information"
-        401:
-          description: "Unauthorized"
-        500:
-          description: "Internal server error"
-  /mechanics/change-password:
-    put:
-      tags: [Mechanics]
-      summary: "Change mechanic password"
+      tags:
+        - Inventory
+      summary: Mechanic gets low stock parts
       security:
         - BearerAuth: []
       parameters:
-        - in: body
-          name: passwords
-          required: true
+        - name: threshold
+          in: query
+          required: false
           schema:
-            $ref: "#/definitions/PasswordChange"
+            type: integer
       responses:
-        200:
-          description: "Password successfully changed"
-        401:
-          description: "Old password is incorrect"
-        500:
-          description: "Internal server error"
-  /mechanics/admin/update/{id}:
-    put:
-      tags: [Mechanics]
-      summary: "Admin update mechanic"
-      security:
-        - BearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          type: integer
-        - in: body
-          name: mechanic
-          required: true
-          schema:
-            $ref: "#/definitions/MechanicUpdate"
-      responses:
-        200:
-          description: "Mechanic updated by admin"
-        404:
-          description: "Mechanic not found"
-        500:
-          description: "Internal server error"
-  /mechanics/admin/create:
-    post:
-      tags: [Mechanics]
-      summary: "Create admin"
-      security:
-        - BearerAuth: []
-      parameters:
-        - in: body
-          name: admin
-          required: true
-          schema:
-            $ref: "#/definitions/AdminCreate"
-      responses:
-        201:
-          description: "Admin created"
-        409:
-          description: "Admin already exists"
-        500:
-          description: "Internal server error"
-  /mechanics/admin/login:
-    post:
-      tags: [Mechanics]
-      summary: "Admin login"
-      parameters:
-        - in: body
-          name: adminLogin
-          required: true
-          schema:
-            $ref: "#/definitions/AdminLogin"
-      responses:
-        200:
-          description: "Admin login successful"
-        401:
-          description: "Invalid admin credentials"
-        500:
-          description: "Internal server error"
-  /customers/:
-    post:
-      tags: [Customers]
-      summary: "Create customer (admin only)"
-      security:
-        - BearerAuth: []
-      parameters:
-        - in: body
-          name: customer
-          required: true
-          schema:
-            $ref: "#/definitions/CustomerRegister"
-      responses:
-        201:
-          description: "Customer created"
-        400:
-          description: "Invalid input"
-        409:
-          description: "Email already exists"
-        500:
-          description: "Internal server error"
-  /customers/login:
-    post:
-      tags: [Customers]
-      summary: "Customer login"
-      parameters:
-        - in: body
-          name: credentials
-          required: true
-          schema:
-            $ref: "#/definitions/CustomerLogin"
-      responses:
-        200:
-          description: "Login successful (JWT token returned)"
-        401:
-          description: "Invalid credentials"
-        500:
-          description: "Internal server error"
-  /customers/register:
-    post:
-      tags: [Customers]
-      summary: "Register new customer (public)"
-      parameters:
-        - in: body
-          name: customer
-          required: true
-          schema:
-            $ref: "#/definitions/CustomerRegister"
-      responses:
-        201:
-          description: "Customer registered"
-        400:
-          description: "Invalid input"
-        409:
-          description: "Email already exists"
-        500:
-          description: "Internal server error"
-  /customers/my-tickets:
-    get:
-      tags: [Customers]
-      summary: "Get tickets for current customer"
-      security:
-        - BearerAuth: []
-      responses:
-        200:
-          description: "List of tickets"
-        401:
-          description: "Unauthorized"
-        500:
-          description: "Internal server error"
-  /customers/{id}:
-    get:
-      tags: [Customers]
-      summary: "Get own customer profile"
-      security:
-        - BearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          type: integer
-      responses:
-        200:
-          description: "Customer profile"
-        403:
-          description: "Forbidden"
-        404:
-          description: "Customer not found"
-        500:
-          description: "Internal server error"
-    put:
-      tags: [Customers]
-      summary: "Update own customer profile"
-      security:
-        - BearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          type: integer
-        - in: body
-          name: customer
-          required: true
-          schema:
-            $ref: "#/definitions/CustomerRegister"
-      responses:
-        200:
-          description: "Customer updated"
-        400:
-          description: "Invalid input"
-        403:
-          description: "Forbidden"
-        404:
-          description: "Customer not found"
-        500:
-          description: "Internal server error"
-  /customers/admin/{id}:
-    get:
-      tags: [Customers]
-      summary: "Admin gets customer by id"
-      security:
-        - BearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          type: integer
-      responses:
-        200:
-          description: "Customer profile"
-        404:
-          description: "Customer not found"
-        500:
-          description: "Internal server error"
-  /customers/admin/update/{id}:
-    put:
-      tags: [Customers]
-      summary: "Admin updates customer"
-      security:
-        - BearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          type: integer
-        - in: body
-          name: customer
-          required: true
-          schema:
-            $ref: "#/definitions/CustomerRegister"
-      responses:
-        200:
-          description: "Customer updated"
-        400:
-          description: "Invalid input"
-        404:
-          description: "Customer not found"
-        500:
-          description: "Internal server error"
-  /customers/admin/delete/{id}:
-    delete:
-      tags: [Customers]
-      summary: "Admin deletes customer"
-      security:
-        - BearerAuth: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          type: integer
-      responses:
-        200:
-          description: "Customer deleted"
-        404:
-          description: "Customer not found"
-        500:
-          description: "Internal server error"
+        '200':
+          description: List of low stock parts
+        '400':
+          description: Bad request
 definitions:
   PublicInventoryItem:
     type: object
@@ -929,6 +1117,24 @@ definitions:
         type: string
       quantity:
         type: integer
+  ServiceTicketFieldsUpdate:
+    type: object
+    properties:
+      description:
+        type: string
+        example: "Tires have been replaced and vehicle is ready to go!"
+      vehicle_id:
+        type: integer
+        example: 1
+      hours_worked:
+        type: integer
+        example: 5
+      repair:
+        type: string
+        example: "Tire replacement"
+    required:
+      - description
+      - hours_worked
   MechanicCreate:
     type: object
     properties:
@@ -984,8 +1190,10 @@ definitions:
     properties:
       username:
         type: string
+        example: "admin"
       password:
         type: string
+        example: "admin123"
     required:
       - username
       - password
