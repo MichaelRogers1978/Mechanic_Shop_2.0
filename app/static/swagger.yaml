@@ -10,8 +10,8 @@ basePath: "/"
 securityDefinitions:
   BearerAuth:
     type: apiKey
-    swagger: "2.0"
     in: header
+    name: Authorization
     description: "JWT token using Bearer token number. Example: 'Bearer {token number}'"
 paths:
   /mechanics/admin/login:
