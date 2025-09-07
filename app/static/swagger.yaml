@@ -12,7 +12,7 @@ securityDefinitions:
     type: apiKey
     in: header
     name: Authorization
-    description: "Enter your token as: Bearer {token}. Example: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'"
+    description: "Enter your token as: Bearer {token}."
 paths:
   /mechanics/admin/login:
     post:
@@ -69,7 +69,7 @@ paths:
     post:
       tags: [Mechanics]
       summary: "Create admin user (username must be 'admin')"
-      description: "This endpoint is only for initial admin user creation. Username must be 'admin'. Not for mechanic creation."
+      description: "This endpoint is only for initial admin creation. Username must be 'admin'. This is not for mechanic creation."
       parameters:
         - in: body
           name: admin
@@ -92,7 +92,7 @@ paths:
     post:
       tags: [Mechanics]
       summary: "Admin add new mechanic"
-      description: "Allows an admin to add a new mechanic. Requires Bearer token. Request body must include name, email, phone, and username. Password must be at least 6 characters. Returns the created mechanic object."
+      description: "Allows an admin to add a new mechanic. Requires Bearer token."
       security:
         - BearerAuth: []
       parameters:
@@ -116,15 +116,15 @@ paths:
           schema:
             $ref: "#/definitions/Mechanic"
         400:
-          description: "Invalid input (missing required fields, password too short, etc.)"
+          description: "Invalid input (missing required fields.)"
         409:
-          description: "Mechanic already exists (email conflict)"
+          description: "Mechanic already exists (check for an email confliction)"
         500:
           description: "Internal server error"
     get:
       tags: [Mechanics]
       summary: "Get all mechanics (public, paginated)"
-      description: "Public can view a paginated list of mechanics. Supports pagination with 'page' and 'per_page' query parameters."
+      description: "Public can view a paginated list of mechanics."
       parameters:
         - name: page
           in: query
@@ -138,7 +138,7 @@ paths:
           description: "Results per page (for pagination). Example: 10"
       responses:
         200:
-          description: "Paginated list of mechanics (public view)"
+          description: "Paginated list of mechanics ( a public view)"
           schema:
             type: object
             properties:
@@ -276,7 +276,7 @@ paths:
         200:
           description: "Protected mechanic information"
         401:
-          description: "Unauthorized"
+          description: "You are not authorized"
         500:
           description: "Internal server error"
   /mechanics/profile:
@@ -289,7 +289,7 @@ paths:
         200:
           description: "Mechanic profile"
         401:
-          description: "Unauthorized"
+          description: "You are not authorized"
         500:
           description: "Internal server error"
   /mechanics/my-tickets:
@@ -302,7 +302,7 @@ paths:
         200:
           description: "List of tickets assigned to mechanic"
         401:
-          description: "Unauthorized"
+          description: "Unauthorized entry"
         500:
           description: "Internal server error"
   /mechanics/dashboard:
@@ -315,7 +315,7 @@ paths:
         200:
           description: "Dashboard data with tickets & stats"
         401:
-          description: "Unauthorized"
+          description: "Unauthorized entry"
         500:
           description: "Internal server error"
   /mechanics/change-password:
@@ -335,9 +335,9 @@ paths:
         200:
           description: "Password changed successfully"
         400:
-          description: "Invalid input or password requirements not met"
+          description: "Invalid input or password requirements not correctly met"
         401:
-          description: "Unauthorized"
+          description: "Unauthorized input"
         500:
           description: "Internal server error"
   /customers/:
@@ -533,7 +533,7 @@ paths:
         200:
           description: "Customer profile"
         403:
-          description: "Forbidden"
+          description: "Forbidden entry"
         404:
           description: "Customer not found"
         500:
@@ -561,7 +561,7 @@ paths:
                     description: "Current password (required when changing password)"
                   password:
                     type: string
-                    description: "New password (at least 8 characters, required when changing password)"
+                    description: "New password (at least 8 characters are required when changing password)"
       responses:
         200:
           description: "Customer updated"
@@ -583,7 +583,7 @@ paths:
         200:
           description: "List of tickets"
         401:
-          description: "Unauthorized"
+          description: "Unauthorized entry"
         500:
           description: "Internal server error"
   /service-tickets/mechanic/create:
@@ -693,7 +693,7 @@ paths:
     get:
       tags:
         - ServiceTicket
-      summary: Mechanic gets mechanics for ticket
+      summary: Mechanic gets mechanics on a service ticket
       security:
         - BearerAuth: []
       parameters:
@@ -757,7 +757,7 @@ paths:
     get:
       tags:
         - ServiceTicket
-      summary: Customer gets own tickets (paginated)
+      summary: Customer views own service tickets (paginated)
       security:
         - BearerAuth: []
       parameters:
@@ -780,7 +780,7 @@ paths:
     get:
       tags:
         - ServiceTicket
-      summary: Mechanic gets own assigned tickets (paginated, status filter)
+      summary: Mechanic gets own assigned tickets (paginated, has status filter)
       security:
         - BearerAuth: []
       parameters:
@@ -955,7 +955,7 @@ paths:
             properties:
               message:
                 type: string
-                example: "Ticket 1 details updated successfully."
+                example: "Ticket (number) details updated successfully."
               ticket:
                 type: object
               updated_fields:
@@ -964,7 +964,7 @@ paths:
                   type: string
           examples:
             application/json:
-                message: "Ticket 1 details updated successfully."
+                message: "Ticket (number) details updated successfully."
                 ticket:
                   id: 1
                   hours_worked: 5
@@ -1097,7 +1097,7 @@ paths:
     delete:
       tags:
         - Inventory
-      summary: Mechanic deletes part
+      summary: Mechanic deletes a part
       security:
         - BearerAuth: []
       parameters:
@@ -1115,7 +1115,7 @@ paths:
     get:
       tags:
         - Inventory
-      summary: Public searches parts
+      summary: Public searches for parts
       parameters:
         - name: q
           in: query
@@ -1136,7 +1136,7 @@ paths:
     get:
       tags:
         - Inventory
-      summary: Mechanic searches part by name
+      summary: Mechanic searches for a part by name
       security:
         - BearerAuth: []
       parameters:
