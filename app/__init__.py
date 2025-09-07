@@ -1,4 +1,3 @@
-
 import os
 from flask import Flask
 from app.config import DevelopmentConfig, TestingConfig, ProductionConfig
@@ -25,22 +24,21 @@ def create_app(config_name: str = "development"):
     if limiter:
         limiter.init_app(app)
 
-    app.register_blueprint(mechanic_bp, url_prefix="/mechanics")
-    app.register_blueprint(service_ticket_bp, url_prefix="/service-tickets")
-    app.register_blueprint(customer_bp, url_prefix="/customers")
-    app.register_blueprint(inventory_bp, url_prefix="/inventory")
+    app.register_blueprint(mechanic_bp, url_prefix = "/mechanics")
+    app.register_blueprint(service_ticket_bp, url_prefix = "/service-tickets")
+    app.register_blueprint(customer_bp, url_prefix = "/customers")
+    app.register_blueprint(inventory_bp, url_prefix = "/inventory")
 
-    ### Swagger UI setup at /api/docs/
     SWAGGER_URL = '/api/docs'
     API_URL = '/static/swagger.yaml'
     swaggerui_blueprint = get_swaggerui_blueprint(
         SWAGGER_URL,
         API_URL,
-        config={{
+        config = {
             'app_name': "Mechanic Shop API"
-        }}
+        }
     )
-    app.register_blueprint(swaggerui_blueprint, url_prefix=SWAGGER_URL)
+    app.register_blueprint(swaggerui_blueprint, url_prefix = SWAGGER_URL)
 
     if app.config.get("TESTING") or app.config.get("DEBUG"):
         with app.app_context():
