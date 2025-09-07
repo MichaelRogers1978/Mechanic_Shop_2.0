@@ -1128,6 +1128,33 @@ paths:
         '400':
           description: Bad request
 definitions:
+  Mechanic:
+    type: object
+    properties:
+      id:
+        type: integer
+        example: 1
+      name:
+        type: string
+        example: "John Doe"
+      username:
+        type: string
+        example: "johndoe"
+      email:
+        type: string
+        example: "john@example.com"
+      phone:
+        type: string
+        example: "5551234567"
+      address:
+        type: string
+        example: "123 Main St"
+      hours_worked:
+        type: integer
+        example: 0
+      specialty:
+        type: string
+        example: "Brakes"
   PublicInventoryItem:
     type: object
     properties:
