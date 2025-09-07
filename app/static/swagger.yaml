@@ -69,6 +69,7 @@ paths:
     post:
       tags: [Mechanics]
       summary: "Admin add new mechanic"
+      description: "Allows an admin to add a new mechanic. Requires Bearer token. Request body must include name, email, phone, and username. Password must be at least 6 characters. Returns the created mechanic object."
       security:
         - BearerAuth: []
       parameters:
@@ -78,21 +79,23 @@ paths:
           schema:
             $ref: "#/definitions/MechanicCreate"
           example:
-            name: "name"
-            username: "username"
-            email: "email@example.com"
-            address: "address"
-            phone: "1111111111"
-            hours_worked: "Integer"
-            password: "password"
-            specialty: "specialty"
+            name: "John Doe"
+            username: "johndoe"
+            email: "john@example.com"
+            address: "123 Main St"
+            phone: "5551234567"
+            hours_worked: 0
+            password: "password123"
+            specialty: "Brakes"
       responses:
         201:
           description: "Mechanic added by admin"
+          schema:
+            $ref: "#/definitions/Mechanic"
         400:
-          description: "Invalid input"
+          description: "Invalid input (missing required fields, password too short, etc.)"
         409:
-          description: "Mechanic already exists"
+          description: "Mechanic already exists (email conflict)"
         500:
           description: "Internal server error"
   /mechanics/admin/update/{id}:
