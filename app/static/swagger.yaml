@@ -103,13 +103,13 @@ paths:
             $ref: "#/definitions/MechanicCreate"
           example:
             name: "John Doe"
+            password: "password123"
             username: "johndoe"
+            specialty: "Brakes"
             email: "john@example.com"
             address: "123 Main St"
             phone: "5551234567"
             hours_worked: 0
-            password: "password123"
-            specialty: "Brakes"
       responses:
         201:
           description: "Mechanic added by admin"
@@ -352,6 +352,12 @@ paths:
           required: true
           schema:
             $ref: "#/definitions/CustomerRegister"
+          example:
+            name: "Kelly Bundy"
+            email: "kelly@example.com"
+            phone: "1234567890"
+            password: "password123"
+            address: "123 Main St"
       responses:
         201:
           description: "Customer created"
@@ -436,6 +442,12 @@ paths:
           required: true
           schema:
             $ref: "#/definitions/CustomerRegister"
+          example:
+            name: "Bud Bundy"
+            email: "bud@example.com"
+            phone: "0987654321"
+            password: "password123"
+            address: "456 Elm St"
       responses:
         201:
           description: "Customer registered"
