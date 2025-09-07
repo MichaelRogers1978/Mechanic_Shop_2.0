@@ -314,6 +314,71 @@ paths:
           description: "Email already exists"
         500:
           description: "Internal server error"
+    get:
+      tags: [Customers]
+      summary: "Get all customers (admin, paginated)"
+      description: "Admin views a paginated list of customers."
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: page
+          in: query
+          type: integer
+          required: false
+          description: "Page number (for pagination). Example: 1"
+        - name: per_page
+          in: query
+          type: integer
+          required: false
+          description: "Results per page (for pagination). Example: 10"
+      responses:
+        200:
+          description: "Paginated list of customers (admin view)"
+          schema:
+            type: object
+            properties:
+              total:
+                type: integer
+                example: 2
+              pages:
+                type: integer
+                example: 1
+              current_page:
+                type: integer
+                example: 1
+              customers:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                      example: 1
+                    name:
+                      type: string
+                      example: "Kelly Bundy"
+                    email:
+                      type: string
+                      example: "kelly@example.com"
+                    phone:
+                      type: string
+                      example: "1234567890"
+          examples:
+            application/json:
+              total: 2
+              pages: 1
+              current_page: 1
+              customers:
+                - id: 1
+                  name: "Kelly Bundy"
+                  email: "kelly@example.com"
+                  phone: "1234567890"
+                - id: 2
+                  name: "Bud Bundy"
+                  email: "bud@example.com"
+                  phone: "0987654321"
+        400:
+          description: "Bad request"    
   /customers/register:
     post:
       tags: [Customers]
@@ -394,72 +459,6 @@ paths:
           description: "Customer not found"
         500:
           description: "Internal server error"
-  /customers/:
-    get:
-      tags: [Customers]
-      summary: "Get all customers (admin, paginated)"
-      description: "Admin views a paginated list of customers."
-      security:
-        - BearerAuth: []
-      parameters:
-        - name: page
-          in: query
-          type: integer
-          required: false
-          description: "Page number (for pagination). Example: 1"
-        - name: per_page
-          in: query
-          type: integer
-          required: false
-          description: "Results per page (for pagination). Example: 10"
-      responses:
-        200:
-          description: "Paginated list of customers (admin view)"
-          schema:
-            type: object
-            properties:
-              total:
-                type: integer
-                example: 2
-              pages:
-                type: integer
-                example: 1
-              current_page:
-                type: integer
-                example: 1
-              customers:
-                type: array
-                items:
-                  type: object
-                  properties:
-                    id:
-                      type: integer
-                      example: 1
-                    name:
-                      type: string
-                      example: "Kelly Bundy"
-                    email:
-                      type: string
-                      example: "kelly@example.com"
-                    phone:
-                      type: string
-                      example: "1234567890"
-          examples:
-            application/json:
-              total: 2
-              pages: 1
-              current_page: 1
-              customers:
-                - id: 1
-                  name: "Kelly Bundy"
-                  email: "kelly@example.com"
-                  phone: "1234567890"
-                - id: 2
-                  name: "Bud Bundy"
-                  email: "bud@example.com"
-                  phone: "0987654321"
-        400:
-          description: "Bad request"
   /customers/{id}:
     get:
       tags: [Customers]
@@ -838,16 +837,12 @@ paths:
         '500':
           description: Server error
   /service-tickets/{ticket_id}/status:
-    put:
-      tags:
-        - ServiceTicket
-      summary: Update ticket status
-      security:
-        - BearerAuth: []
       put:
         tags:
           - ServiceTicket
         summary: Update ticket status
+        security:
+          - BearerAuth: []
         parameters:
           - name: ticket_id
             in: path
@@ -870,7 +865,7 @@ paths:
       put:
         tags: [ServiceTicket]
         summary: "Update ticket fields"
-        description: "Admin or assigned mechanic can update ticket fields (description, vehicle_id, hours_worked, repair). Requires BearerAuth."
+        description: "Admin or assigned mechanic can update ticket fields"
         security:
           - BearerAuth: []
         parameters:
