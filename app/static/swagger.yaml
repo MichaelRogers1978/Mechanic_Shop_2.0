@@ -12,7 +12,7 @@ securityDefinitions:
     type: apiKey
     in: header
     name: Authorization
-    description: "JWT token using Bearer token number. Example: 'Bearer {token number}'"
+    description: "Enter your token as: Bearer {token}. Example: 'Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9...'"
 paths:
   /mechanics/admin/login:
     post:
@@ -318,6 +318,28 @@ paths:
           description: "Unauthorized"
         500:
           description: "Internal server error"
+  /mechanics/change-password:
+    put:
+      tags: [Mechanics]
+      summary: "Change own password"
+      description: "Mechanic can change their own password. Requires Bearer token."
+      security:
+        - BearerAuth: []
+      parameters:
+        - in: body
+          name: passwordChange
+          required: true
+          schema:
+            $ref: "#/definitions/PasswordChange"
+      responses:
+        200:
+          description: "Password changed successfully"
+        400:
+          description: "Invalid input or password requirements not met"
+        401:
+          description: "Unauthorized"
+        500:
+          description: "Internal server error"
   /customers/:
     post:
       tags: [Customers]
@@ -518,7 +540,16 @@ paths:
           name: customer
           required: true
           schema:
-            $ref: "#/definitions/CustomerRegister"
+            allOf:
+              - $ref: "#/definitions/CustomerRegister"
+              - type: object
+                properties:
+                  old_password:
+                    type: string
+                    description: "Current password (required when changing password)"
+                  password:
+                    type: string
+                    description: "New password (at least 8 characters, required when changing password)"
       responses:
         200:
           description: "Customer updated"
