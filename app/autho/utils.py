@@ -18,11 +18,6 @@ def get_secret_key():
             return key
     except RuntimeError:
         pass
-    
-    #env_key = os.environ.get('SECRET_KEY')
-    #if env_key:
-    #    print(f"Using environment secret key: {env_key[:20]}...")
-    #    return str(env_key)
 
     print(f"Using fixed development secret key: {SECRET_KEY[:1]}...")
     return SECRET_KEY

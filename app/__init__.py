@@ -23,7 +23,6 @@ def create_app(config_name: str = None):
     config_class = CONFIGS.get(config_name, DevelopmentConfig)
     app.config.from_object(config_class)
 
-    # After loading config, check for required DB URI in production
     if config_name == "production" and not app.config.get("SQLALCHEMY_DATABASE_URI") and "pytest" not in sys.modules:
         raise RuntimeError("SQLALCHEMY_DATABASE_URI not set for ProductionConfig")
 

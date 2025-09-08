@@ -249,6 +249,7 @@ paths:
           description: "Mechanic not found"
         500:
           description: "Internal server error"
+  /mechanics/admin/delete/{id}:
     delete:
       tags: [Mechanics]
       summary: "Delete mechanic (admin only)"

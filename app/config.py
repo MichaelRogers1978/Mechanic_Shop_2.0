@@ -1,5 +1,3 @@
-# TEST CHANGE: Forcing update to ensure CI uses the latest config.py
-#No raise runtime errors here
 import os
 import sys
 
