@@ -19,7 +19,9 @@ def create_app(config_name: str = None):
     if config_name is None:
         config_name = os.getenv("FLASK_ENV", "development")
     app = Flask(__name__)
-    app.config.from_object(CONFIGS.get(config_name, DevelopmentConfig))
+    config_class = CONFIGS.get(config_name, DevelopmentConfig)
+    config_instance = config_class() if callable(config_class) else config_class
+    app.config.from_object(config_instance)
 
     db.init_app(app)
     ma.init_app(app)
