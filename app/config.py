@@ -27,10 +27,4 @@ class TestingConfig(BaseConfig):
 
 class ProductionConfig(BaseConfig):
     DEBUG = False
-
-    def __init__(self):
-        super().__init__()
-        self.SQLALCHEMY_DATABASE_URI = os.environ.get("SQLALCHEMY_DATABASE_URI")
-        # Only raise if not running under pytest (i.e., not in CI test collection)
-        if not self.SQLALCHEMY_DATABASE_URI and "pytest" not in sys.modules:
-            raise RuntimeError("SQLALCHEMY_DATABASE_URI not set for ProductionConfig")
+    SQLALCHEMY_DATABASE_URI = os.environ.get("SQLALCHEMY_DATABASE_URI")

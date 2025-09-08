@@ -1,4 +1,5 @@
 import os
+import sys
 from flask import Flask
 from app.config import DevelopmentConfig, TestingConfig, ProductionConfig
 from app.extensions import db, ma, limiter
@@ -20,8 +21,11 @@ def create_app(config_name: str = None):
         config_name = os.getenv("FLASK_ENV", "development")
     app = Flask(__name__)
     config_class = CONFIGS.get(config_name, DevelopmentConfig)
-    config_instance = config_class() if callable(config_class) else config_class
-    app.config.from_object(config_instance)
+    app.config.from_object(config_class)
+
+    # After loading config, check for required DB URI in production
+    if config_name == "production" and not app.config.get("SQLALCHEMY_DATABASE_URI") and "pytest" not in sys.modules:
+        raise RuntimeError("SQLALCHEMY_DATABASE_URI not set for ProductionConfig")
 
     db.init_app(app)
     ma.init_app(app)
