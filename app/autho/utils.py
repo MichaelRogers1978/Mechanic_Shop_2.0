@@ -47,7 +47,7 @@ def encode_mechanic_token(mechanic_id):
         token = jwt.encode(payload, secret_key, algorithm = ALGORITHM)
         
         try:
-            decoded = jwt.decode(token, secret_key, algorithms=[ALGORITHM])
+            decoded = jwt.decode(token, secret_key, algorithms = [ALGORITHM])
             print(f"Token verification successful: {decoded}")
         except Exception as verify_error:
             print(f"Token verification failed: {verify_error}")

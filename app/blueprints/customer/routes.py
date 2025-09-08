@@ -24,7 +24,7 @@ limiter = Limiter(
     default_limits = []
 )
 
-@customer_bp.route("/", methods=['POST'])
+@customer_bp.route("/", methods = ['POST'])
 @admin_token_required
 def create_customer(admin_id):
     data = request.get_json()
@@ -120,7 +120,7 @@ def register_customer():
         logger.error(f"CUSTOMER_REGISTER_ERROR: {str(e)}")
         return jsonify({"error": str(e)}), 400
 
-@customer_bp.route("/my-tickets", methods=['GET'])
+@customer_bp.route("/my-tickets", methods = ['GET'])
 @customer_token_required
 def get_my_tickets(customer_id):
     tickets = ServiceTicket.query.filter_by(customer_id = customer_id).all()
@@ -129,8 +129,8 @@ def get_my_tickets(customer_id):
 @customer_bp.route("/", methods = ['GET'])
 @admin_token_required
 def get_customers(admin_id):
-    page = request.args.get("page", 1, type=int)
-    per_page = request.args.get("per_page", 5, type=int)
+    page = request.args.get("page", 1, type = int)
+    per_page = request.args.get("per_page", 5, type = int)
     
     if page < 1:
         return jsonify({'error': "Page must be a positive number."}), 400

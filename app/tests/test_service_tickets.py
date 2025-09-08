@@ -50,7 +50,7 @@ def create_test_ticket(self):
     db.session.add(part)
     db.session.flush()
 
-    ticket = ServiceTicket(description="Oil change", status="open", customer_id=customer.id)
+    ticket = ServiceTicket(description = "Oil change", status="open", customer_id = customer.id)
     ticket.mechanics.append(mechanic)
     ticket.parts.append(part)
     db.session.add(ticket)
@@ -131,7 +131,7 @@ def create_test_ticket(self):
         response = self.client.put(
             f"/service-tickets/{self.ticket_id}/remove-part/{inventory_id}",
             headers=headers,
-            json={"mechanic_id": self.mechanic_id}
+            json = {"mechanic_id": self.mechanic_id}
         )
         self.assertIn(response.status_code, [200, 404])
 

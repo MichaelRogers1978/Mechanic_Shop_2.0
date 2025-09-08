@@ -119,7 +119,7 @@ def get_customer_ticket_count(current_admin_id, customer_id):
             per_page = 50
     
         total_count = ServiceTicket.query.filter_by(customer_id = customer_id).count()
-        tickets_paginated = ServiceTicket.query.filter_by(customer_id=customer_id)\
+        tickets_paginated = ServiceTicket.query.filter_by(customer_id = customer_id)\
         .paginate(page = page, per_page = per_page, error_out = False)
     
         logger.info(f"GET_CUSTOMER_TICKET_COUNT: Admin {current_admin_id} viewed ticket count for customer {customer_id}.")
@@ -494,7 +494,7 @@ def update_ticket_status(ticket_id):
         }
         
         if 'hours_worked' in data:
-            response_data['hours_updated'] = f"Hours worked: {old_hours} → {data['hours_worked']}."
+            response_data['hours_updated'] = f"Hours worked: {old_hours} {data['hours_worked']}."
         
         return jsonify(response_data), 200
         
