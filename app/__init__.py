@@ -15,7 +15,9 @@ CONFIGS = {
     "production": ProductionConfig,
 }
 
-def create_app(config_name: str = "development"):
+def create_app(config_name: str = None):
+    if config_name is None:
+        config_name = os.getenv("FLASK_ENV", "development")
     app = Flask(__name__)
     app.config.from_object(CONFIGS.get(config_name, DevelopmentConfig))
 
