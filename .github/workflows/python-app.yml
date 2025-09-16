@@ -36,4 +36,4 @@ jobs:
         pytest
     - name: Deploy to Render
       if: success()
-      run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK_URL }}
+  run: curl -X POST ${{ secrets.RENDER_DEPLOY_HOOK }}
