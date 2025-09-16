@@ -187,4 +187,4 @@ Key learnings:
 - CI failures often reveal deeper architectural issues—embrace the debugging.
 
 This project reflects my persistence, resilince and commitment to maintainable, secure, and
- collaborative development.
+ collaborative development.  
